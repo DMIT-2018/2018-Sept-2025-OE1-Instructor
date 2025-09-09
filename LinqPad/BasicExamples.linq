@@ -59,5 +59,55 @@ Albums.Where(album => album.Artist.Name == "Deep Purple").Dump();
 //	For example: Albums.Where(album => album.Tracks.Composer == "Coverdale").Dump
 //	The example will never work, because album.Tracks is not a single record
 
+//==================== Anonymous Datasets ===========================
+//Basic data from our entity collections is returned with a Class <Artist> and <Album>
+Artists.Where(x => x.ArtistId < 6).Dump();
+Albums.Where(x => x.AlbumId < 6).Dump();
 
+//If we only want certain fields we can return an anonymous collection of data
+//	We use the new keyword to say we want to define (shape) the data to a new type
+//	Below we are not shaping to a class or defined type, it is anonymous <> (empty)
+Albums.Where(x => x.AlbumId < 6)
+		.Select(x => new
+		{
+			Title = x.Title,
+			Year = x.ReleaseYear,
+			Label = x.ReleaseLabel
+		}).Dump();
 
+//We can order our results, remember to use the names that you define
+//	ReleaseYear no longer exists in our NEW Type, we must use Year
+Albums.Where(x => x.AlbumId < 6)
+		.Select(x => new
+		{
+			Title = x.Title,
+			Year = x.ReleaseYear,
+			Label = x.ReleaseLabel
+		})
+		.OrderByDescending(x => x.Year)
+		.Dump();
+
+//We can also use our navigational properties to shape data from multiple tables!
+//	Navigate to the Artist (parent) record to get the name of the artist from the single parent record
+
+Albums.Where(x => x.AlbumId < 6)
+		.Select(x => new
+		 {
+			 Title = x.Title,
+			 Year = x.ReleaseYear,
+			 Label = x.ReleaseLabel,
+			 Artist = x.Artist.Name
+		 }).Dump();
+
+//Navigation in any type (anonymous or otherwise) to a child record will return a collection
+//	We cannot select a single field/property straight from the child record collection
+Albums.Where(x => x.AlbumId < 6)
+		.Select(x => new
+		{
+			Title = x.Title,
+			Year = x.ReleaseYear,
+			Label = x.ReleaseLabel,
+			Artist = x.Artist.Name,
+			Tracks = x.Tracks
+		}).Dump();
+		

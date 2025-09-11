@@ -111,3 +111,53 @@ Albums.Where(x => x.AlbumId < 6)
 			Tracks = x.Tracks
 		}).Dump();
 		
+//============ Terinary Operators ===============================
+
+//Must have a true and a false path that contains 1 statement each.
+//	Remember a statement is ended with a semi-colon
+//Function like a if/else with single statements
+//	conditional test ? true statement : false statement
+
+var test = true;
+//statements all the way, you can nest as many terinary operators as you want.
+var test2 = test ? true : test ? true : false;
+
+Random rand = new Random();
+var num = rand.Next(1, 5);
+var numResult = num == 1 ? "The number is 1" : 
+				num == 2 ? "The number is 2" : 
+				num == 3 ? "The number is 3" : "The number is to high!"; 
+num.Dump();
+numResult.Dump();
+
+//This could be rewritten as if/else or as a switch, but with a terinary operator it remains as one simple statement.
+
+//Example: We can replace null or white space Fax numbers for customers with the word "Unknown"
+Customers.OrderByDescending(x => x.Fax)
+			.Select(x => new
+			{
+				Name = x.FirstName + " " + x.LastName,
+				Country = x.Country,
+				Fax = x.Fax == null || x.Fax.Trim() == "" ? "Unknown" : x.Fax
+			}).Dump();
+			
+//You can use multiple conditions with && and || or
+//You can call methods, use data from navigational properties, etc.
+//	As long as the condition of the terinary operator return true or false, it will work.
+
+Albums.Select(x => new 
+	{
+		Title = x.Title,
+		Artist = x.Artist.Name,
+		Year = x.ReleaseYear,
+		Decade = x.ReleaseYear < 1970 ? "Oldies" : 
+					x.ReleaseYear < 1980 ? "70s" :
+					x.ReleaseYear < 1990 ? "80s" :
+					x.ReleaseYear < 2000 ? "90s" : "Modern"
+	})
+	.OrderBy(x => x.Year)
+	.Dump();
+	
+	
+	
+	

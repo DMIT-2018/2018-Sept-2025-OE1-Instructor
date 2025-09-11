@@ -64,4 +64,20 @@ Products
 	.ThenBy(x => x.ProductName)
 	.Dump();
 
+//4.
+
+Invoices
+	.Where(x => x.Customer.Geography.ContinentName == "Europe")
+	.Select(x => new
+	{
+		InvoiceNo = x.InvoiceID,
+		//ToString with formatting does not work in LinqPad well, you can get just the date
+		//	with .Date, then use .ToString()
+		InvoiceDate = x.DateKey.Date.ToString(),
+		CustomerName = $"{x.Customer.FirstName} {x.Customer.LastName}",
+		City = x.Customer.Geography.CityName,
+		Country = x.Customer.Geography.RegionCountryName
+	})
+	.OrderBy(x => x.City)
+	.Dump();
 

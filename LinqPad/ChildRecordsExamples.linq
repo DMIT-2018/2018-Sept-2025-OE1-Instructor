@@ -60,6 +60,9 @@ Artists
 						Album = a.Title,
 						Label = a.ReleaseLabel,
 						Year = a.ReleaseYear,
+						//Aggregates only work on collections
+						//	This means we are typically using them on child record collection
+						TrackCount = a.Tracks.Count(),
 						Tracks = a.Tracks
 									.Select(t => new TrackView
 									{
@@ -74,6 +77,25 @@ Artists
 									.ToList()
 					})
 					.ToList()
+	})
+	.ToList()
+	.Dump();
+	
+//Aggregate Examples
+Albums
+	//Can be used in Where Clauses to filter data
+	.Where(a => a.Tracks.Sum(t => t.Milliseconds) / 1000 > 4000)
+	.Select(a => new
+	{
+		Name = a.Title,
+		Artist = a.Artist.Name,
+		TrackCount = a.Tracks.Count(),
+		//Must supply which field to look at using the Lambda Expression
+		//	t => t.[Field]
+		AlbumLength = a.Tracks.Sum(t => t.Milliseconds) /1000,
+		MaxTrackLength = a.Tracks.Max(t => t.Milliseconds/1000),
+		MinTrackLength = a.Tracks.Min(t => t.Milliseconds/1000),
+		AverageTrackLength = a.Tracks.Average(t => t.Milliseconds/1000)
 	})
 	.ToList()
 	.Dump();
@@ -92,6 +114,7 @@ public class AlbumView
 	public string Album {get; set;}
 	public string Label {get; set;}
 	public int Year {get; set;}
+	public int TrackCount {get; set;}
 	//Note: All Lists in views should be automatically populated by an empty list
 	//	 = [];
 	// 	[] has the same meaning as new List<TrackView>()

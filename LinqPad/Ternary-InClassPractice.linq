@@ -42,4 +42,35 @@ Products
 	.Dump();
 	
 //Other Example
-//Get the 
+//Get the Actual (Effective) Price of each Unit from InvoiceLines based on if there was a discount or not
+//	If there is a discount then UnitPrice - DiscountAmount
+
+InvoiceLines
+	.Select(x => new
+	{
+		InvoiceID = x.InvoiceID,
+		ProductID = x.ProductID,
+		//We can return and compute values from the database in the ternary results
+		//	Remember each side of the ternary (true/false) must return the same datattype
+		ActualPrice = x.DiscountAmount > 0 ? x.UnitPrice - x.DiscountAmount : x.UnitPrice
+	})
+	.OrderBy(x => x.InvoiceID)
+	.ThenBy(x => x.ProductID)
+	.Dump();
+	
+//We can use Ternary Operators in other methods
+//Example Group By
+Employees
+	.GroupBy(x => new {Salaried = x.SalariedFlag.Value ? "Salary" : "Not Salary"})
+	.Select(x => new
+	{
+		Salaried = x.Key.Salaried,
+		Employees = x.ToList()
+	})
+	.Dump();
+	
+	
+	
+	
+	
+	

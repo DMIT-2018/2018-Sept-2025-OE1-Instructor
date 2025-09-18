@@ -90,7 +90,65 @@ Stores
 	.ToList()
 	.Dump();
 	
+//Q7
+ProductSubcategories
+	//Another spot to put the where clause using .Any()
+	//.Where(x => x.Products.Any(p => p.UnitCost != null) && x.Products.Any(p => p.UnitPrice != null))
+	.Select(x => new 
+	{
+		Category = x.ProductCategory.ProductCategoryName,
+		SubCategory = x.ProductSubcategoryName,
+		LowestCost = x.Products.Min(p => p.UnitCost),
+		LowestPrice = x.Products.Min(p => p.UnitPrice),
+		MaxCost = x.Products.Max(p => p.UnitCost),
+		MaxPrice = x.Products.Max(p => p.UnitPrice),
+	})
+	//This is acceptable as well
+	.Where(x => x.LowestCost != null && x.LowestPrice != null)
+	.OrderBy(x => x.Category)
+	.Dump();
 	
+//Q8
+Stores
+	.Select(x => new
+	{
+		StoreID = x.StoreID,
+		Name = x.StoreName,
+		//Since the StoreID in the Invoice Table is not nullable
+		//	the aggregate function cannot return null or there is an
+		//	error thrown
+		//	So we check the .Count() of the child records
+		//	before we try and use an aggregate method 
+		//	and if there are no child records we assume the return value will be 0
+		LargestInvoiceAmount = x.Invoices.Count() == 0 ? 0 : x.Invoices.Max(i => i.TotalAmount)
+	})
+	.OrderBy(x => x.Name)
+	.ToList()
+	.Dump();
 	
+//Q9
+Invoices
+	.Select(x => new 
+	{
+		InvoiceNo = x.InvoiceID,
+		InvoiceDate = x.DateKey,
+		//We can also use the .Any() Method to determine if there are child records
+		AverageQty = x.InvoiceLines.Any() ? x.InvoiceLines.Average(i => i.SalesQuantity) : 0
+	})
+	.ToList()
+	.Dump();
 	
+//Q10
+Stores
+	.Select(x => new
+	{
+		StoreID = x.StoreID,
+		Name = x.StoreName,
+		AverageSales = x.Invoices.Any() ? x.Invoices.Average(i => i.TotalAmount) : 0
+	})
+	.OrderBy(x => x.Name)
+	.Dump();
 	
+
+
+

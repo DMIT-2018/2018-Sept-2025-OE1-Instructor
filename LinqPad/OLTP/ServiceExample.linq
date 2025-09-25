@@ -28,6 +28,97 @@ void Main()
 {
 	CodeBehind codeBehind = new CodeBehind(this); // “this” is LINQPad’s auto Context
 	
+	//Change to true to see the resulting record
+	bool verbose = false;
+	
+	//Fail Tests
+	//Rule: either last name or phone must be provided
+	//Simple Error Check
+	codeBehind.GetCustomers(string.Empty, string.Empty);
+	codeBehind.ErrorDetails.Dump("Fail Expected - Either a partial phone number or a last name must be provided");
+	
+	//Coloured Testing
+	//strings are empty
+	if(codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+	{
+		Util.WithStyle("Pass - (Fail Expected) Empty Last Name and Phone Number","color:LimeGreen").Dump();
+	}
+	else 
+	{
+		Util.WithStyle("Fail - No error or incorrect error for Empty Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+	}
+	if(verbose)
+		codeBehind.ErrorDetails.Dump();
+	
+	//strings are null
+	codeBehind.GetCustomers(null, null);
+	if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+	{
+		Util.WithStyle("Pass - (Fail Expected) Null Last Name and Phone Number", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - No error or incorrect error for Null Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+	}
+	if (verbose)
+		codeBehind.ErrorDetails.Dump();
+
+	//strings are white space
+	codeBehind.GetCustomers("     ", "    ");
+	if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+	{
+		Util.WithStyle("Pass - (Fail Expected) White space Last Name and Phone Number", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - No error or incorrect error for White space Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+	}
+	if (verbose)
+		codeBehind.ErrorDetails.Dump();
+
+	//Check: No records are returned
+	codeBehind.GetCustomers("zzzzzz", "9999999");
+	if (codeBehind.ErrorDetails.Any(x => x.Contains("No customers were found")))
+	{
+		Util.WithStyle("Pass - (Fail Expected) No customers found for provided values", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - No error or incorrect error for provided values, expected no customer were found", "color:OrangeRed;font-weight:bold").Dump();
+	}
+	if (verbose)
+		codeBehind.ErrorDetails.Dump();
+	
+	//Pass Check - Returned Values by Last Name
+	codeBehind.GetCustomers("Foster","");
+	if (codeBehind.Customers.Count == 14)
+	{
+		Util.WithStyle("Pass - Last Name search returned the correct number of results.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - Last name returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+		if(verbose)
+			codeBehind.ErrorDetails.Dump();
+	}
+	if(verbose)
+		codeBehind.Customers.Dump();
+
+
+	// Pass Check - Returned Values by exact phone
+	codeBehind.GetCustomers("", "7804326565");
+	if (codeBehind.Customers.Count == 1)
+	{
+		Util.WithStyle("Pass - Exact Phone search returned the correct number of results.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - Exact phone returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	}
+	if (verbose)
+		codeBehind.Customers.Dump();
 }
 
 // ———— PART 2: Code Behind → Code Behind Method ————
@@ -44,7 +135,7 @@ public class CodeBehind(TypedDataContext context)
 	// Mock injection of the service into our code-behind.
 	// You will need to refactor this for proper dependency injection.
 	// NOTE: The TypedDataContext must be passed in.
-	private readonly CustomerService YourService = new CustomerService(context);
+	private readonly CustomerService CustomerService = new CustomerService(context);
 	#endregion
 
 	#region Fields from Blazor Page Code-Behind
@@ -56,6 +147,38 @@ public class CodeBehind(TypedDataContext context)
 	private string errorMessage = string.Empty;
 	#endregion
 
+	//Need to create a variable to hold any returned values
+	//default sets the value to the data type default
+	//	! says to the code (compiler), ignore any nulls, I don't care
+	//	Note: Never use ! unless you know it does not matter!
+	//		This means at this point is your education/careers,
+	//		don't use it unless you ask or have been told to use it!
+	public List<CustomerSearchView> Customers = default!;
+	
+	//Same name and the same parameters as the method in your library (service)
+	public void GetCustomers(string lastName, string phone)
+	{
+		//Always start by clearing messages (feedback and errors)
+		//	You start with this so you don't have repeated messages
+		errorDetails.Clear();
+		errorMessage = string.Empty; //I use string.Empty and not "" because it is smaller
+		feedbackMessage = string.Empty;
+		
+		//Wrap the call to any service method in a try/catch
+		try
+		{
+			var results = CustomerService.GetCustomers(lastName, phone);
+			if(results.IsSuccess)
+				Customers = results.Value;
+			else
+				errorDetails = GetErrorMessages(results.Errors.ToList());
+		}
+		catch (Exception ex)
+		{
+			//capture any unexpected exceptions
+			errorMessage = ex.Message;
+		}
+	}
 }
 #endregion
 

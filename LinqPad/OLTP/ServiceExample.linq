@@ -40,6 +40,7 @@ void Main()
 	//Coloured Testing
 	//strings are empty
 	#region GetCustomers Tests
+	"=============== GetCustomers Tests ===================".Dump();
 	codeBehind.GetCustomers(string.Empty, string.Empty);
 	if(codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
 	{
@@ -124,6 +125,7 @@ void Main()
 	#endregion
 
 	#region GetCustomer_ByID Tests
+	"=============== Customer By ID Tests ===================".Dump();
 	codeBehind.GetCustomer_ByID(0);
 	if (codeBehind.ErrorDetails.Any(x => x.Contains("A valid CustomerID must be provided")))
 	{
@@ -168,6 +170,67 @@ void Main()
 	}
 	if (verbose)
 		codeBehind.EditCustomer.Dump();
+	#endregion
+
+	#region Lookup Tests
+	"=============== Lookup Tests ===================".Dump();
+	codeBehind.GetLookupValues(0);
+	if (codeBehind.ErrorDetails.Any(x => x.Contains("CategoryID must be provided.")))
+	{
+		Util.WithStyle("Pass - No lookups were returned for the input 0.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - No error or the incorrect error was thrown for 0 input.", "color:OrangeRed;font-weight:bold").Dump();
+		if (verbose)
+			codeBehind.Lookups.Dump();
+	}
+	if (verbose)
+		codeBehind.ErrorDetails.Dump();
+	codeBehind.GetLookupValues(string.Empty);
+	if (codeBehind.ErrorDetails.Any(x => x.Contains("Category Name must be provided.")))
+	{
+		Util.WithStyle("Pass - No lookups were returned for an empty string.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - No error or the incorrect error was thrown for an empty string.", "color:OrangeRed;font-weight:bold").Dump();
+		if (verbose)
+			codeBehind.Lookups.Dump();
+	}
+	if (verbose)
+		codeBehind.ErrorDetails.Dump();
+
+	//Good Scenarios
+	codeBehind.GetLookupValues("Country");
+	if (codeBehind.Lookups.Count == 3
+		&& codeBehind.Lookups[0].Name == "Canada")
+	{
+		Util.WithStyle("Pass - Lookup Category Country returned 3 results correctly.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - Lookup Category Name returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	}
+	if (verbose)
+		codeBehind.Lookups.Dump();
+
+	codeBehind.GetLookupValues(3);
+	if (codeBehind.Lookups.Count == 4
+		&& codeBehind.Lookups[0].Name == "Bronze")
+	{
+		Util.WithStyle("Pass - Lookup CategoryID 3 returned 4 results correctly.", "color:LimeGreen").Dump();
+	}
+	else
+	{
+		Util.WithStyle("Fail - Lookup CategoryID 3 returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	}
+	if (verbose)
+		codeBehind.Lookups.Dump();
 	#endregion
 }
 
@@ -232,7 +295,6 @@ public class CodeBehind(TypedDataContext context)
 			errorMessage = ex.Message;
 		}
 	}
-
 	public void GetCustomer_ByID(int customerID)
 	{
 		//Always start by clearing messages (feedback and errors)
@@ -256,7 +318,6 @@ public class CodeBehind(TypedDataContext context)
 			errorMessage = ex.Message;
 		}
 	}
-	
 	public void GetLookupValues(int categoryID)
 	{
 		errorDetails.Clear();
@@ -295,6 +356,26 @@ public class CodeBehind(TypedDataContext context)
 		catch (Exception ex)
 		{
 			//capture any unexpected exceptions
+			errorMessage = ex.Message;
+		}
+	}
+	
+	public void AddEditCustomer(CustomerEditView editCustomer)
+	{
+		errorDetails.Clear();
+		errorMessage = string.Empty;
+		feedbackMessage = string.Empty;
+		
+		try
+		{
+			var result = CustomerService.AddEditCustomer(editCustomer);
+			if(result.IsSuccess)
+				EditCustomer = result.Value;
+			else
+				errorDetails = GetErrorMessages(result.Errors.ToList());
+		}
+		catch(Exception ex)
+		{
 			errorMessage = ex.Message;
 		}
 	}
@@ -421,6 +502,146 @@ public class CustomerService
 		}
 		
 		return result.WithValue(customer);
+	}
+	
+	//Because the validation for editing and adding is similar, we are making an AddEdit Method
+	public Result<CustomerEditView> AddEditCustomer(CustomerEditView editCustomer)
+	{
+		var result = new Result<CustomerEditView>();
+		
+		//Rule: editCustomer cannot be null
+		if(editCustomer == null)
+		{
+			result.AddError(new Error("Missing Information", "No customer was provided."));
+			return result;
+		}
+		
+		#region Business Logic
+		//rule: Mandatory Fields were provided
+		//	Check the database if fields have not null and no provided default then we 
+		//	want to prevent the database directly giving the user an error.
+		//We are to collect all errors, to tell the users everything that is 
+		//	incorrect at one time.
+		if(string.IsNullOrWhiteSpace(editCustomer.FirstName))
+			result.AddError(new Error("Missing Information", "First Name is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.LastName))
+			result.AddError(new Error("Missing Information", "Last Name is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.Address1))
+			result.AddError(new Error("Missing Information", "Address1 is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.City))
+			result.AddError(new Error("Missing Information", "City is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.PostalCode))
+			result.AddError(new Error("Missing Information", "Postal Code is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.Phone))
+			result.AddError(new Error("Missing Information", "Phone is required."));
+		if (string.IsNullOrWhiteSpace(editCustomer.Email))
+			result.AddError(new Error("Missing Information", "Email is required."));
+		if (editCustomer.ProvStateID <= 0)
+			result.AddError(new Error("Missing Information", "A Province or State is required."));
+		if (editCustomer.CountryID <= 0)
+			result.AddError(new Error("Missing Information", "A Country is required."));
+		if (editCustomer.StatusID <= 0)
+			result.AddError(new Error("Missing Information", "A Customer Status is required."));
+		
+		//rule: Duplicate check
+		//	FirstName, LastName, and Phone cannot match an existing record
+
+		bool existingCustomer = _context.Customers
+				.Any(x => x.FirstName.ToLower() == editCustomer.FirstName.ToLower()
+					&& x.LastName.ToLower() == editCustomer.LastName.ToLower()
+					&& x.Phone == editCustomer.Phone
+					&& x.CustomerID != editCustomer.CustomerID);
+		
+		if(existingCustomer)
+		{
+			result.AddError(new Error("Existing Customer Data", $"A customer with the name {editCustomer.FirstName} {editCustomer.LastName} and the phone number {editCustomer.Phone} already exists in the database and cannot be entered again."));
+		}
+		
+		//check if there are any errors so far
+		//	if there are return the errors and get out
+		if(result.IsFailure)
+			return result;
+		#endregion
+
+		//If no errors were found we can proceed to add or edit
+		//First we check if there is an existingCustomer in the database
+		//	We need the existing customer to edit the database record
+		//	NOTE: You are returning the actual Database Type (Customer)
+		Customer customer = _context.Customers
+			.Where(x => x.CustomerID == editCustomer.CustomerID)
+			.FirstOrDefault();
+
+		//Check if the results are null
+		//	If null AND the provided record has an ID of 0
+		//	we are creating a new customer record
+		//	If the customerID is 0, then this is a new record
+		//	If the customerID is not 0, then we are editing a record
+		if(customer == null && editCustomer.CustomerID == 0)
+		{
+			//Create a new Customer record
+			customer = new();
+		}
+		else
+		{
+			result.AddError(new Error("Cannot find Record to Edit", $"CustomerID {editCustomer.CustomerID} cannot be found, edits cannot be made."));
+			return result;
+		}
+		
+		//Now we have the existing customer or the new customer record
+		//	If editing, we are just updating the database values
+		//	If new, we are adding new values to the record
+		//	Both of these steps are done the same way
+		customer.FirstName = editCustomer.FirstName;
+		customer.LastName = editCustomer.LastName;
+		customer.Address1 = editCustomer.Address1;
+		customer.Address2 = editCustomer.Address2;
+		customer.City = editCustomer.City;
+		customer.ProvStateID = editCustomer.ProvStateID;
+		customer.CountryID = editCustomer.CountryID;
+		customer.PostalCode = editCustomer.PostalCode;
+		customer.Phone = editCustomer.Phone;
+		customer.Email = editCustomer.Email;
+		customer.StatusID = editCustomer.StatusID;
+		//This may be a logical delete in the edit
+		//	We still can use the AddEdit method to logically delete
+		//	We don't need a different method unless for specific reasons
+		customer.RemoveFromViewFlag = editCustomer.RemoveFromViewFlag;
+		
+		//check again if it is a new customer
+		//	THIS IS LOCAL ONLY
+		//	NOTHING SAVES TO THE DATABASE YET
+		if(customer.CustomerID == 0)
+			//If new we add the record
+			_context.Customers.Add(customer);
+		else
+			//if not update the record
+			_context.Customers.Update(customer);
+		
+		//Now we want to save the record or changes to the database
+		//We wrap this in a try/catch always so if there is an unexpected error
+		//	we can tell the user and not just crash our app
+		try
+		{
+			//Commit the change to the database (save them)
+			_context.SaveChanges();
+			//Use the method we already coded to return the newly add or editing record
+			//NOTE: make sure to use the database entity ID field
+			//	Why? If it was a new data entry, the editCustomer CustomerID will still be 0
+			//	But the customer.CustomerID will have the new database assigned CustomerID
+			//THIS IS ONE OF THE BIGGEST MISTAKE I SEE
+			return GetCustomer_ByID(customer.CustomerID);
+		}
+		catch(Exception ex)
+		{
+			//if something goes wrong
+			//	return error and clear the change tracker
+			// NOTE: It is suuuuuppppper important to clear the change tracker
+			//	If you do not, then any database change are still staged (Add or Update) and will continue to fail
+			//	whenever you call this method again from the same page.
+			_context.ChangeTracker.Clear();
+			result.AddError(new Error("Error Saving Changes", ex.InnerException.Message));
+			return result;
+		}
 	}
 }
 

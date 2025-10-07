@@ -13,225 +13,227 @@
       <EFProvider>Microsoft.EntityFrameworkCore.SqlServer</EFProvider>
     </DriverData>
   </Connection>
-  <NuGetReference>BYSResults</NuGetReference>
 </Query>
 
 // 	Lightweight result types for explicit success/failure 
 //	 handling in .NET applications.
 using BYSResults;
 
-// —————— PART 1: Main → UI ——————
-//	Driver is responsible for orchestrating the flow by calling 
-//	various methods and classes that contain the actual business logic 
-//	or data processing operations.
 void Main()
 {
-	CodeBehind codeBehind = new CodeBehind(this); // “this” is LINQPad’s auto Context
+	// —————— PART 1: Main → UI ——————
+	//	Driver is responsible for orchestrating the flow by calling 
+	//	various methods and classes that contain the actual business logic 
+	//	or data processing operations.
+	void Main()
+	{
+		CodeBehind codeBehind = new CodeBehind(this); // “this” is LINQPad’s auto Context
 	
-	//Change to true to see the resulting record
-	bool verbose = false;
+		//Change to true to see the resulting record
+		bool verbose = false;
 	
-	//Fail Tests
-	//Rule: either last name or phone must be provided
-	//Simple Error Check
-	//codeBehind.GetCustomers(string.Empty, string.Empty);
-	//codeBehind.ErrorDetails.Dump("Fail Expected - Either a partial phone number or a last name must be provided");
+		//Fail Tests
+		//Rule: either last name or phone must be provided
+		//Simple Error Check
+		//codeBehind.GetCustomers(string.Empty, string.Empty);
+		//codeBehind.ErrorDetails.Dump("Fail Expected - Either a partial phone number or a last name must be provided");
 	
-	//Coloured Testing
-	//strings are empty
-	#region GetCustomers Tests
-	"=============== GetCustomers Tests ===================".Dump();
-	codeBehind.GetCustomers(string.Empty, string.Empty);
-	if(codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
-	{
-		Util.WithStyle("Pass - (Fail Expected) Empty Last Name and Phone Number","color:LimeGreen").Dump();
-	}
-	else 
-	{
-		Util.WithStyle("Fail - No error or incorrect error for Empty Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
-	}
-	if(verbose)
-		codeBehind.ErrorDetails.Dump();
-	
-	//strings are null
-	codeBehind.GetCustomers(null, null);
-	if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
-	{
-		Util.WithStyle("Pass - (Fail Expected) Null Last Name and Phone Number", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or incorrect error for Null Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-
-	//strings are white space
-	codeBehind.GetCustomers("     ", "    ");
-	if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
-	{
-		Util.WithStyle("Pass - (Fail Expected) White space Last Name and Phone Number", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or incorrect error for White space Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-
-	//Check: No records are returned
-	codeBehind.GetCustomers("zzzzzz", "9999999");
-	if (codeBehind.ErrorDetails.Any(x => x.Contains("No customers were found")))
-	{
-		Util.WithStyle("Pass - (Fail Expected) No customers found for provided values", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or incorrect error for provided values, expected no customer were found", "color:OrangeRed;font-weight:bold").Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-	
-	//Pass Check - Returned Values by Last Name
-	codeBehind.GetCustomers("Foster","");
-	if (codeBehind.Customers.Count == 14)
-	{
-		Util.WithStyle("Pass - Last Name search returned the correct number of results.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - Last name returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
-		if(verbose)
-			codeBehind.ErrorDetails.Dump();
-	}
-	if(verbose)
-		codeBehind.Customers.Dump();
-
-
-	// Pass Check - Returned Values by exact phone
-	codeBehind.GetCustomers("", "7804326565");
-	if (codeBehind.Customers.Count == 1)
-	{
-		Util.WithStyle("Pass - Exact Phone search returned the correct number of results.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - Exact phone returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+		//Coloured Testing
+		//strings are empty
+		#region GetCustomers Tests
+		"=============== GetCustomers Tests ===================".Dump();
+		codeBehind.GetCustomers(string.Empty, string.Empty);
+		if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+		{
+			Util.WithStyle("Pass - (Fail Expected) Empty Last Name and Phone Number", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or incorrect error for Empty Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+		}
 		if (verbose)
 			codeBehind.ErrorDetails.Dump();
-	}
-	if (verbose)
-		codeBehind.Customers.Dump();
-	#endregion
-
-	#region GetCustomer_ByID Tests
-	"=============== Customer By ID Tests ===================".Dump();
-	codeBehind.GetCustomer_ByID(0);
-	if (codeBehind.ErrorDetails.Any(x => x.Contains("A valid CustomerID must be provided")))
-	{
-		Util.WithStyle("Pass - No customer was returned for the input 0.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or the incorrect error was thrown for 0 input.", "color:OrangeRed;font-weight:bold").Dump();
+	
+		//strings are null
+		codeBehind.GetCustomers(null, null);
+		if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+		{
+			Util.WithStyle("Pass - (Fail Expected) Null Last Name and Phone Number", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or incorrect error for Null Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		//strings are white space
+		codeBehind.GetCustomers("     ", "    ");
+		if (codeBehind.ErrorDetails.Any(x => x == "Missing Information: Either a partial phone number or a last name must be provided"))
+		{
+			Util.WithStyle("Pass - (Fail Expected) White space Last Name and Phone Number", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or incorrect error for White space Last Name and Phone", "color:OrangeRed;font-weight:bold").Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		//Check: No records are returned
+		codeBehind.GetCustomers("zzzzzz", "9999999");
+		if (codeBehind.ErrorDetails.Any(x => x.Contains("No customers were found")))
+		{
+			Util.WithStyle("Pass - (Fail Expected) No customers found for provided values", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or incorrect error for provided values, expected no customer were found", "color:OrangeRed;font-weight:bold").Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		//Pass Check - Returned Values by Last Name
+		codeBehind.GetCustomers("Foster", "");
+		if (codeBehind.Customers.Count == 14)
+		{
+			Util.WithStyle("Pass - Last Name search returned the correct number of results.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - Last name returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.ErrorDetails.Dump();
+		}
+		if (verbose)
+			codeBehind.Customers.Dump();
+	
+	
+		// Pass Check - Returned Values by exact phone
+		codeBehind.GetCustomers("", "7804326565");
+		if (codeBehind.Customers.Count == 1)
+		{
+			Util.WithStyle("Pass - Exact Phone search returned the correct number of results.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - Exact phone returned the incorrect number of results or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.ErrorDetails.Dump();
+		}
+		if (verbose)
+			codeBehind.Customers.Dump();
+		#endregion
+	
+		#region GetCustomer_ByID Tests
+		"=============== Customer By ID Tests ===================".Dump();
+		codeBehind.GetCustomer_ByID(0);
+		if (codeBehind.ErrorDetails.Any(x => x.Contains("A valid CustomerID must be provided")))
+		{
+			Util.WithStyle("Pass - No customer was returned for the input 0.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or the incorrect error was thrown for 0 input.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.EditCustomer.Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		codeBehind.GetCustomer_ByID(-2);
+		if (codeBehind.ErrorDetails.Any(x => x.Contains("A valid CustomerID must be provided")))
+		{
+			Util.WithStyle("Pass - No customer was returned for the input -2.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or the incorrect error was thrown for -2 input.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.EditCustomer.Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		//Good Scenario
+		codeBehind.GetCustomer_ByID(6);
+		if (codeBehind.EditCustomer != null
+				&& codeBehind.EditCustomer.FirstName == "Fred"
+				&& codeBehind.EditCustomer.LastName == "Foster")
+		{
+			Util.WithStyle("Pass - CustomerID 6 returned the correct customer.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - Exact phone returned the incorrect Customer or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.ErrorDetails.Dump();
+		}
 		if (verbose)
 			codeBehind.EditCustomer.Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-
-	codeBehind.GetCustomer_ByID(-2);
-	if (codeBehind.ErrorDetails.Any(x => x.Contains("A valid CustomerID must be provided")))
-	{
-		Util.WithStyle("Pass - No customer was returned for the input -2.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or the incorrect error was thrown for -2 input.", "color:OrangeRed;font-weight:bold").Dump();
-		if (verbose)
-			codeBehind.EditCustomer.Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
+		#endregion
 	
-	//Good Scenario
-	codeBehind.GetCustomer_ByID(6);
-	if (codeBehind.EditCustomer != null
-			&& codeBehind.EditCustomer.FirstName == "Fred"
-			&& codeBehind.EditCustomer.LastName == "Foster")
-	{
-		Util.WithStyle("Pass - CustomerID 6 returned the correct customer.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - Exact phone returned the incorrect Customer or an error was returned.", "color:OrangeRed;font-weight:bold").Dump();
+		#region Lookup Tests
+		"=============== Lookup Tests ===================".Dump();
+		codeBehind.GetLookupValues(0);
+		if (codeBehind.ErrorDetails.Any(x => x.Contains("CategoryID must be provided.")))
+		{
+			Util.WithStyle("Pass - No lookups were returned for the input 0.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or the incorrect error was thrown for 0 input.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.Lookups.Dump();
+		}
 		if (verbose)
 			codeBehind.ErrorDetails.Dump();
-	}
-	if (verbose)
-		codeBehind.EditCustomer.Dump();
-	#endregion
-
-	#region Lookup Tests
-	"=============== Lookup Tests ===================".Dump();
-	codeBehind.GetLookupValues(0);
-	if (codeBehind.ErrorDetails.Any(x => x.Contains("CategoryID must be provided.")))
-	{
-		Util.WithStyle("Pass - No lookups were returned for the input 0.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or the incorrect error was thrown for 0 input.", "color:OrangeRed;font-weight:bold").Dump();
+		codeBehind.GetLookupValues(string.Empty);
+		if (codeBehind.ErrorDetails.Any(x => x.Contains("Category Name must be provided.")))
+		{
+			Util.WithStyle("Pass - No lookups were returned for an empty string.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - No error or the incorrect error was thrown for an empty string.", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.Lookups.Dump();
+		}
+		if (verbose)
+			codeBehind.ErrorDetails.Dump();
+	
+		//Good Scenarios
+		codeBehind.GetLookupValues("Country");
+		if (codeBehind.Lookups.Count == 3
+			&& codeBehind.Lookups[0].Name == "Canada")
+		{
+			Util.WithStyle("Pass - Lookup Category Country returned 3 results correctly.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - Lookup Category Name returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.ErrorDetails.Dump();
+		}
 		if (verbose)
 			codeBehind.Lookups.Dump();
-	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-	codeBehind.GetLookupValues(string.Empty);
-	if (codeBehind.ErrorDetails.Any(x => x.Contains("Category Name must be provided.")))
-	{
-		Util.WithStyle("Pass - No lookups were returned for an empty string.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - No error or the incorrect error was thrown for an empty string.", "color:OrangeRed;font-weight:bold").Dump();
+	
+		codeBehind.GetLookupValues(3);
+		if (codeBehind.Lookups.Count == 4
+			&& codeBehind.Lookups[0].Name == "Bronze")
+		{
+			Util.WithStyle("Pass - Lookup CategoryID 3 returned 4 results correctly.", "color:LimeGreen").Dump();
+		}
+		else
+		{
+			Util.WithStyle("Fail - Lookup CategoryID 3 returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
+			if (verbose)
+				codeBehind.ErrorDetails.Dump();
+		}
 		if (verbose)
 			codeBehind.Lookups.Dump();
+		#endregion
 	}
-	if (verbose)
-		codeBehind.ErrorDetails.Dump();
-
-	//Good Scenarios
-	codeBehind.GetLookupValues("Country");
-	if (codeBehind.Lookups.Count == 3
-		&& codeBehind.Lookups[0].Name == "Canada")
-	{
-		Util.WithStyle("Pass - Lookup Category Country returned 3 results correctly.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - Lookup Category Name returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
-		if (verbose)
-			codeBehind.ErrorDetails.Dump();
-	}
-	if (verbose)
-		codeBehind.Lookups.Dump();
-
-	codeBehind.GetLookupValues(3);
-	if (codeBehind.Lookups.Count == 4
-		&& codeBehind.Lookups[0].Name == "Bronze")
-	{
-		Util.WithStyle("Pass - Lookup CategoryID 3 returned 4 results correctly.", "color:LimeGreen").Dump();
-	}
-	else
-	{
-		Util.WithStyle("Fail - Lookup CategoryID 3 returned the incorrect results or an error", "color:OrangeRed;font-weight:bold").Dump();
-		if (verbose)
-			codeBehind.ErrorDetails.Dump();
-	}
-	if (verbose)
-		codeBehind.Lookups.Dump();
-	#endregion
 }
 
 // ———— PART 2: Code Behind → Code Behind Method ————
@@ -270,7 +272,7 @@ public class CodeBehind(TypedDataContext context)
 	public List<CustomerSearchView> Customers = default!;
 	public CustomerEditView EditCustomer = default!;
 	public List<LookupView> Lookups = default!;
-	
+
 	//Same name and the same parameters as the method in your library (service)
 	public void GetCustomers(string lastName, string phone)
 	{
@@ -279,12 +281,12 @@ public class CodeBehind(TypedDataContext context)
 		errorDetails.Clear();
 		errorMessage = string.Empty; //I use string.Empty and not "" because it is smaller
 		feedbackMessage = string.Empty;
-		
+
 		//Wrap the call to any service method in a try/catch
 		try
 		{
 			var results = CustomerService.GetCustomers(lastName, phone);
-			if(results.IsSuccess)
+			if (results.IsSuccess)
 				Customers = results.Value;
 			else
 				errorDetails = GetErrorMessages(results.Errors.ToList());
@@ -300,7 +302,7 @@ public class CodeBehind(TypedDataContext context)
 		//Always start by clearing messages (feedback and errors)
 		//	You start with this so you don't have repeated messages
 		errorDetails.Clear();
-		errorMessage = string.Empty; 
+		errorMessage = string.Empty;
 		feedbackMessage = string.Empty;
 
 		//Wrap the call to any service method in a try/catch
@@ -321,7 +323,7 @@ public class CodeBehind(TypedDataContext context)
 	public void GetLookupValues(int categoryID)
 	{
 		errorDetails.Clear();
-		errorMessage = string.Empty; 
+		errorMessage = string.Empty;
 		feedbackMessage = string.Empty;
 
 		try
@@ -359,22 +361,22 @@ public class CodeBehind(TypedDataContext context)
 			errorMessage = ex.Message;
 		}
 	}
-	
+
 	public void AddEditCustomer(CustomerEditView editCustomer)
 	{
 		errorDetails.Clear();
 		errorMessage = string.Empty;
 		feedbackMessage = string.Empty;
-		
+
 		try
 		{
 			var result = CustomerService.AddEditCustomer(editCustomer);
-			if(result.IsSuccess)
+			if (result.IsSuccess)
 				EditCustomer = result.Value;
 			else
 				errorDetails = GetErrorMessages(result.Errors.ToList());
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			errorMessage = ex.Message;
 		}
@@ -409,16 +411,16 @@ public class CustomerService
 		//Result is set up at the top of the method
 		//	Give the result the same type as the Result return type
 		var result = new Result<List<CustomerSearchView>>();
-		
+
 		//rule: Must have either a phone number or a last name
-		if(string.IsNullOrWhiteSpace(lastName) && string.IsNullOrWhiteSpace(phone))
+		if (string.IsNullOrWhiteSpace(lastName) && string.IsNullOrWhiteSpace(phone))
 		{
 			result.AddError(new Error("Missing Information", "Either a partial phone number or a last name must be provided"));
 			//Since this is missing information, there is no point in continuing
 			//	So we GTFO
 			return result;
 		}
-		
+
 		//rule: (Standard Rule) RemoveFromViewFlag cannot be true
 		//	This is a typical rule to follow when returning data
 		var customer = _context.Customers
@@ -434,7 +436,7 @@ public class CustomerService
 						&&
 					x.Phone.Contains(phone)
 					)
-				)	
+				)
 			)
 			.Select(x => new CustomerSearchView
 			{
@@ -447,13 +449,13 @@ public class CustomerService
 				TotalSales = x.Invoices.Sum(i => i.SubTotal + i.Tax)
 			})
 			.ToList();
-			
-		if(!customer.Any())
+
+		if (!customer.Any())
 		{
 			result.AddError(new Error("No Customer", "No customers were found"));
 			return result;
 		}
-		
+
 		//Happy path - we got customers and no business rules broken
 		//Remember to return the happy path results WithValue!
 		return result.WithValue(customer);
@@ -494,35 +496,35 @@ public class CustomerService
 				HasInvoices = x.Invoices.Any()
 			})
 			.FirstOrDefault();
-			
-		if(customer == null)
+
+		if (customer == null)
 		{
 			result.AddError(new Error("No Customer", $"No customer was found with ID: {customerID}"));
 			return result;
 		}
-		
+
 		return result.WithValue(customer);
 	}
-	
+
 	//Because the validation for editing and adding is similar, we are making an AddEdit Method
 	public Result<CustomerEditView> AddEditCustomer(CustomerEditView editCustomer)
 	{
 		var result = new Result<CustomerEditView>();
-		
+
 		//Rule: editCustomer cannot be null
-		if(editCustomer == null)
+		if (editCustomer == null)
 		{
 			result.AddError(new Error("Missing Information", "No customer was provided."));
 			return result;
 		}
-		
+
 		#region Business Logic
 		//rule: Mandatory Fields were provided
 		//	Check the database if fields have not null and no provided default then we 
 		//	want to prevent the database directly giving the user an error.
 		//We are to collect all errors, to tell the users everything that is 
 		//	incorrect at one time.
-		if(string.IsNullOrWhiteSpace(editCustomer.FirstName))
+		if (string.IsNullOrWhiteSpace(editCustomer.FirstName))
 			result.AddError(new Error("Missing Information", "First Name is required."));
 		if (string.IsNullOrWhiteSpace(editCustomer.LastName))
 			result.AddError(new Error("Missing Information", "Last Name is required."));
@@ -542,7 +544,7 @@ public class CustomerService
 			result.AddError(new Error("Missing Information", "A Country is required."));
 		if (editCustomer.StatusID <= 0)
 			result.AddError(new Error("Missing Information", "A Customer Status is required."));
-		
+
 		//rule: Duplicate check
 		//	FirstName, LastName, and Phone cannot match an existing record
 
@@ -553,15 +555,15 @@ public class CustomerService
 					//This makes sure if the same customer exists in the database already with
 					//	the existing ID then we can still edit that customer.
 					&& x.CustomerID != editCustomer.CustomerID);
-		
-		if(existingCustomer)
+
+		if (existingCustomer)
 		{
 			result.AddError(new Error("Existing Customer Data", $"A customer with the name {editCustomer.FirstName} {editCustomer.LastName} and the phone number {editCustomer.Phone} already exists in the database and cannot be entered again."));
 		}
-		
+
 		//check if there are any errors so far
 		//	if there are return the errors and get out
-		if(result.IsFailure)
+		if (result.IsFailure)
 			return result;
 		#endregion
 
@@ -578,7 +580,7 @@ public class CustomerService
 		//	we are creating a new customer record
 		//	If the customerID is 0, then this is a new record
 		//	If the customerID is not 0, then we are editing a record
-		if(customer == null && editCustomer.CustomerID == 0)
+		if (customer == null && editCustomer.CustomerID == 0)
 		{
 			//Create a new Customer record
 			customer = new();
@@ -588,7 +590,7 @@ public class CustomerService
 			result.AddError(new Error("Cannot find Record to Edit", $"CustomerID {editCustomer.CustomerID} cannot be found, edits cannot be made."));
 			return result;
 		}
-		
+
 		//Now we have the existing customer or the new customer record
 		//	If editing, we are just updating the database values
 		//	If new, we are adding new values to the record
@@ -608,17 +610,17 @@ public class CustomerService
 		//	We still can use the AddEdit method to logically delete
 		//	We don't need a different method unless for specific reasons
 		customer.RemoveFromViewFlag = editCustomer.RemoveFromViewFlag;
-		
+
 		//check again if it is a new customer
 		//	THIS IS LOCAL ONLY
 		//	NOTHING SAVES TO THE DATABASE YET
-		if(customer.CustomerID == 0)
+		if (customer.CustomerID == 0)
 			//If new we add the record
 			_context.Customers.Add(customer);
 		else
 			//if not update the record
 			_context.Customers.Update(customer);
-		
+
 		//Now we want to save the record or changes to the database
 		//We wrap this in a try/catch always so if there is an unexpected error
 		//	we can tell the user and not just crash our app
@@ -633,7 +635,7 @@ public class CustomerService
 			//THIS IS ONE OF THE BIGGEST MISTAKE I SEE
 			return GetCustomer_ByID(customer.CustomerID);
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			//if something goes wrong
 			//	return error and clear the change tracker
@@ -663,17 +665,17 @@ public class LookupService
 					?? throw new ArgumentNullException(nameof(context));
 	}
 	#endregion
-	
+
 	public Result<List<LookupView>> GetLookupValues(string categoryName)
 	{
 		var result = new Result<List<LookupView>>();
 		//rule: categoryName must have a value
-		if(string.IsNullOrWhiteSpace(categoryName))
+		if (string.IsNullOrWhiteSpace(categoryName))
 		{
 			result.AddError(new Error("Missing Information", "Category Name must be provided."));
 			return result;
 		}
-		
+
 		var values = _context.Lookups
 			.Where(x => x.Category.CategoryName.ToLower() == categoryName.ToLower()
 				&& !x.RemoveFromViewFlag)
@@ -684,13 +686,13 @@ public class LookupService
 			})
 			.OrderBy(x => x.Name)
 			.ToList();
-			
-		if(values.Count <= 0)
+
+		if (values.Count <= 0)
 		{
 			result.AddError(new Error("No Lookup Values", $"No lookup values found for the category name: {categoryName}"));
 			return result;
 		}
-		
+
 		return result.WithValue(values);
 	}
 
@@ -736,49 +738,49 @@ public class CustomerSearchView
 {
 	//Building the Class to cut down and only return
 	//	the information we need to display the required data
-	
+
 	//Almost ALWAYS have a reference of the Primary Key(s)
 	//	This is used to make sure we are looking at the right record
-	public int CustomerID {get; set;}
+	public int CustomerID { get; set; }
 	//Calculated Field - Only a string but it doesn't 
 	//	exist in the database
-	public string FullName {get; set;} = string.Empty; //All Strings must default to an empty string
+	public string FullName { get; set; } = string.Empty; //All Strings must default to an empty string
+														 //Calculated Field
+	public string Address { get; set; } = string.Empty;
+	public string Phone { get; set; } = string.Empty;
+	public string Email { get; set; } = string.Empty;
 	//Calculated Field
-	public string Address {get; set;} = string.Empty;
-	public string Phone {get; set;} = string.Empty;
-	public string Email {get; set;} = string.Empty;
+	public string Status { get; set; } = string.Empty;
 	//Calculated Field
-	public string Status {get; set;} = string.Empty;
-	//Calculated Field
-	public decimal TotalSales {get; set;}
+	public decimal TotalSales { get; set; }
 }
 
 //We need to get the Customer for Editing differently then for lists or the search
 public class CustomerEditView
 {
-	public int CustomerID {get; set;}
-	public string FirstName {get; set;} = string.Empty;
-	public string LastName {get; set;} = string.Empty;
-	public string Address1 {get; set;} = string.Empty;
-	public string Address2 {get; set;} = string.Empty;
-	public string City {get; set;} = string.Empty;
-	public int ProvStateID {get; set;}
-	public int CountryID {get; set;}
-	public string PostalCode {get; set;} = string.Empty;
-	public string Phone {get; set;} = string.Empty;
-	public string Email {get; set;} = string.Empty;
-	public int StatusID {get; set;}
-	public bool RemoveFromViewFlag {get; set;}
+	public int CustomerID { get; set; }
+	public string FirstName { get; set; } = string.Empty;
+	public string LastName { get; set; } = string.Empty;
+	public string Address1 { get; set; } = string.Empty;
+	public string Address2 { get; set; } = string.Empty;
+	public string City { get; set; } = string.Empty;
+	public int ProvStateID { get; set; }
+	public int CountryID { get; set; }
+	public string PostalCode { get; set; } = string.Empty;
+	public string Phone { get; set; } = string.Empty;
+	public string Email { get; set; } = string.Empty;
+	public int StatusID { get; set; }
+	public bool RemoveFromViewFlag { get; set; }
 	//Additional Fields
 	//We can add additional calculated fields (fields not in the database) still
 	public string OriginalFirstName { get; set; } = string.Empty;
-	public bool HasInvoices {get; set;}
+	public bool HasInvoices { get; set; }
 }
 
 public class LookupView
 {
-	public int LookupID {get; set;}
-	public string Name {get; set;} = string.Empty;
+	public int LookupID { get; set; }
+	public string Name { get; set; } = string.Empty;
 }
 #endregion
 

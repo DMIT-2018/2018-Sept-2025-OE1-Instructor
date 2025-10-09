@@ -934,8 +934,15 @@ public class InvoiceService
 			.FirstOrDefault();
 		//If the invoice doesn't exist, create it
 		if(invoice == null && invoiceView.InvoiceID == 0)
+		{
 			invoice = new Invoice();
-
+		}
+		else
+		{
+			result.AddError(new Error("Invoice Not Found", $"An invoice with invoiceID {invoiceView.InvoiceID} could not be found to edit."));
+			return result;
+		}
+			
 		//Update the invoice properties from the supplied View Model
 		invoice.CustomerID = invoiceView.CustomerID;
 		invoice.EmployeeID = invoiceView.EmployeeID;
@@ -948,7 +955,82 @@ public class InvoiceService
 		invoice.Tax = 0;
 		
 		//Loop through each child record to update or add them
-		//WILL FINISH NEXT CLASS
+		foreach(var invoiceLineView in invoiceView.InvoiceLines)
+		{
+			//Try and retrieve the child record from the database
+			InvoiceLine invoiceLine = _context.InvoiceLines
+				.Where(x => x.InvoiceLineID == invoiceLineView.InvoiceLineID
+						&& !x.RemoveFromViewFlag)
+				.FirstOrDefault();
+			//If the child record doesn't exist or had been previously deleted, create it.
+			if(invoiceLine == null)
+			{
+				invoiceLine = new InvoiceLine();
+				//We put the PartID update in the if() where we create a new record
+				//	because we only change the identifying FK if it is a new record
+				//	PartID would not get updated if the invoiceLine already exists
+				invoiceLine.PartID = invoiceLineView.PartID;
+			}
+			//Update other properties from the ViewModel
+			invoiceLine.Quantity = invoiceLineView.Quantity;
+			invoiceLine.Price = invoiceLineView.Price;
+			//Also update the logical delete flag in case it is flagged for deletion
+			invoiceLine.RemoveFromViewFlag = invoiceLineView.RemoveFromViewFlag;
+			
+			//Inside the foreach loop update the subtotal and tax per record
+			//	Only use it is the Subtotal and Tax calcs if the record isn't 
+			//	logically deleted
+			if(!invoiceLineView.RemoveFromViewFlag)
+			{
+				invoice.SubTotal += invoiceLine.Quantity * invoiceLine.Price;
+				bool isTaxable = _context.Parts
+						.Where(x => x.PartID == invoiceLine.PartID)
+						.Select(x => x.Taxable)
+						.FirstOrDefault();
+				//Add the m after the tax amount to make it a decimal
+				invoice.Tax += isTaxable ? invoiceLine.Quantity * invoiceLine.Price * 0.05m : 0;
+			}
+			
+			//Check once more if it is existing or new
+			//Remember if the ID is 0 it is new
+			if(invoiceLine.InvoiceLineID == 0)
+				//This is a child record so WE NEVER ADD DIRECTLY TO THE DATABASE
+				//	We add the records to the collection of the parent record (navigational property)
+				//	When the parent record is later saved to the database,
+				//	the FK (invoiceID) of the parent records is automatically
+				//	added to our new child record
+				//	NOTE: If this was a NEW Invoice we have no idea what the InvoiceID is yet
+				//		We cannot add this invoiceLine to the database without the FK
+				invoice.InvoiceLines.Add(invoiceLine);
+			else
+				//Since it is an update, it already has the FK info it needs
+				//	which means we can directly stage the update in the database
+				_context.InvoiceLines.Update(invoiceLine);
+		}
+		
+		//MAKE SURE YOU ARE OUTSIDE THE FOREACH LOOP
+		//Once all child records are processed, you can check if the parent record
+		//	is new or existing to stage our database changes
+		if(invoice.InvoiceID == 0)
+			_context.Invoices.Add(invoice);
+		else
+			_context.Invoices.Update(invoice); 
+			
+		//Always remember your try/catch
+		try
+		{
+			_context.SaveChanges();
+			//Use the previously programmed method to return the InvoiceView
+			//Remember to use the database records for any values needed for this method
+			return GetInvoice(invoice.InvoiceID, invoice.CustomerID, invoice.EmployeeID);
+		}
+		catch (Exception ex)
+		{
+			//Rollback any changes if there is an error
+			_context.ChangeTracker.Clear();
+			result.AddError(new Error("Error Saving Changes", ex.InnerException.Message));
+			return result;
+		}
 	}
 }
 	#endregion

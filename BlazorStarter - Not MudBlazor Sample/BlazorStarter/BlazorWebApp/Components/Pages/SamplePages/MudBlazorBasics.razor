@@ -36,19 +36,124 @@
     </MudCard>
 </MudStack>
 
-<MudGrid>
+<MudGrid Class="mt-4">
     <MudItem xs="12" sm="6" md="4">
-        <MudText Typo="Typo.h5">Text Boxes</MudText>
-        <MudTextField Label="Email Address"
-                      @bind-Value="emailText"
-                      Required
-                      InputType="InputType.Email"
-                      Variant="Variant.Outlined" />
-        <MudTextField Label="Password"
-                      @bind-Value="passwordText"
-                      Required
-                      RequiredError="Password is super needed!"
-                      InputType="InputType.Password"
-                      Variant="Variant.Outlined" />
+        <MudForm @ref="textForm" @bind-IsValid="textIsValid">
+            <MudText Typo="Typo.h5">Text Boxes</MudText>
+            <MudTextField Label="Email Address"
+                          @bind-Value="emailText"
+                          Required
+                          InputType="InputType.Email"
+                          Variant="Variant.Outlined"
+                          Immediate />
+            <MudTextField Label="Password"
+                          @bind-Value="passwordText"
+                          Required
+                          RequiredError="Password is super needed!"
+                          InputType="InputType.Password"
+                          Variant="Variant.Outlined"
+                          Immediate />
+            <!-- 
+                When using MudDatePicker you must use @bind-Date!
+                Do not use @bind-Value
+            -->
+            <MudDatePicker Label="Date"
+                           @bind-Date="dateText"
+                           Variant="Variant.Outlined" 
+                           MinDate="DateTime.Today"/>
+            <MudStack Row
+                      Spacing="4"
+                      Justify="Justify.FlexEnd">
+                 <MudButton Variant="Variant.Outlined"
+                            Color="Color.Tertiary"
+                            OnClick="TextSubmit">
+                    Text Submit        
+                </MudButton>
+                <!-- Using () => lets us make one line of code a simple method -->
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Info"
+                           OnClick="@(() => textForm.Validate())">
+                    Validate Text       
+                </MudButton>
+            </MudStack>
+            <MudText Color="@(textIsValid ? Color.Success : Color.Error)">
+                @(textIsValid ? "Text form in Valid." : "Text form has errors!")
+            </MudText>
+        </MudForm>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudText Typo="Typo.h5">Radio buttons, Checkbox, Text Area</MudText>
+        <MudRadioGroup @bind-Value="mudMeal">
+            <MudText Typo="Typo.h6">Select your favourite meal (MudBlazor): </MudText>
+            <!-- Note: Name in the InputRadioGroup and InputRadio items must match -->
+            <MudStack>
+                @foreach (var meal in meals)
+                {
+                    <MudRadio Value="@meal">@meal</MudRadio>
+                }
+            </MudStack>
+        </MudRadioGroup>
+        <MudCheckBox @bind-Value="acceptanceBox"
+                     Color="Color.Primary"
+                     Label="I accept the terms of service" />
+        <MudTextField Label="Enter a message"
+                      Variant="Variant.Outlined"
+                      @bind-Value="messageBody"
+                      Immediate
+                      Lines="5" />
+        <MudButton OnClick="RadioCheckAreaSubmit"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary">
+            Radio/Check/Area Submit
+        </MudButton>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudText Typo="Typo.h5">List and Slider</MudText>
+        <!-- Display a label for the dropdown -->
+        <MudSelect Label="Select a ride"
+                   Variant="Variant.Outlined"
+                   @bind-Value="myRide"
+                   Placeholder="Select ride..."
+                   Clearable
+                   Required
+                   RequiredError="Ride selection is required">
+            @foreach (var item in rides)
+            {
+                <!--
+                    Use the .Key for the dictionary as the value as it is an int
+                    Use the .Value to display the string value from the dictionary
+                    REMEMBER TO SPECIFY THE T (type) of the MudSelectItem when using
+                    a nullable value to bind.
+                    For example: the T="int?" is used to specify that the value can be null
+                -->
+                <MudSelectItem T="int?" Value="@item.Key">@item.Value</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect Label="Select Vacation Spots"
+                   @bind-SelectedValues="selectedVacationSpots"
+                   @bind-Value="vacationSpot"
+                   Variant="Variant.Outlined"
+                   MultiSelection="true"
+                   Clearable
+                   Required
+                   RequiredError="You must select at least one vacation spot"
+                   Placeholder="Select Vacation Spots">
+            @foreach (var item in vacationSpots)
+            {
+                <MudSelectItem Value="@item">@item</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSlider @bind-Value="reviewRating"
+                   Min="0"
+                   Max="10"
+                   Step="1">
+            Rate the form control review (0 = bad, 10 = good)
+        </MudSlider>
+        <MudText Typo="Typo.body2"><strong>Rating: </strong>@reviewRating</MudText>
+        <MudButton OnClick="ListSliderSubmit"
+                   Variant="Variant.Filled">
+            List/Slider Submit
+        </MudButton>
     </MudItem>
 </MudGrid>
+<MudText Typo="Typo.h4" Align="Align.Center">@feedback</MudText>

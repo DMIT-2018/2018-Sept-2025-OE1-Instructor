@@ -1,0 +1,54 @@
+﻿@page "/SamplePages/mud-basics"
+
+<PageTitle>MudBlazor Basics</PageTitle>
+
+<MudText Typo="Typo.h3" Align="Align.Center">Introduction to Blazor with MudBlazor</MudText>
+
+<MudStack AlignItems="AlignItems.Center">
+    <MudCard Elevation="4" Class="mt-2" Style="max-width: 450px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h5">Demo of using Methods</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            @if(IsEven)
+            {
+                <MudAlert Severity="Severity.Success">
+                    <MudText>The number @oddEvenValue is Even.</MudText>
+                </MudAlert>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Warning">
+                    <MudText>The number @oddEvenValue is Odd.</MudText>
+                </MudAlert>
+            }
+        </MudCardContent>
+        <MudCardActions>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="RandomValue"
+                       StartIcon="@Icons.Material.Filled.AutoFixHigh">
+                Random Value
+            </MudButton>
+            <MudSpacer />
+        </MudCardActions>
+    </MudCard>
+</MudStack>
+
+<MudGrid>
+    <MudItem xs="12" sm="6" md="4">
+        <MudText Typo="Typo.h5">Text Boxes</MudText>
+        <MudTextField Label="Email Address"
+                      @bind-Value="emailText"
+                      Required
+                      InputType="InputType.Email"
+                      Variant="Variant.Outlined" />
+        <MudTextField Label="Password"
+                      @bind-Value="passwordText"
+                      Required
+                      RequiredError="Password is super needed!"
+                      InputType="InputType.Password"
+                      Variant="Variant.Outlined" />
+    </MudItem>
+</MudGrid>

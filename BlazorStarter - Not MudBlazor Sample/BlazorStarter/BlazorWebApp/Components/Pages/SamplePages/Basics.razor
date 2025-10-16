@@ -1,0 +1,172 @@
+﻿@page "/SamplePages/Basics"
+
+<PageTitle>Review page basics</PageTitle>
+
+<h1>Introduction to Blazor Page (Review)</h1>
+
+@{
+    //Comments in Razor can be like this in a @{ } to use //
+}
+
+<!--
+    Or comments can be like this within these "arrows"
+-->
+@{
+    // Blazor Components Combine C# and HTML in a single file
+    // The '@' symbol is used to switch between HTML to C#
+    // When using '@', you are in the C# environment, allowing for C# code execution
+    // Without '@' you are in the HTML environment, where you can write standard HTML
+}
+<div>
+    <h3>Demonstration of using Methods</h3>
+    <!--Conditionally display content based on if the oddEvenValue is Even or Odd-->
+    @if (IsEven)
+    {
+        <!--
+            Display a message if the value is even
+            injects the MY_NAME constant and oddEvenValue field
+            into the HTML using the 'at' symbol
+        -->
+        <p>@MY_NAME is even (value: @oddEvenValue)</p>
+    }
+    else
+    {
+        <!--Display a different messasge is the value is odd-->
+        <p>The random number is odd (value: @oddEvenValue)</p>
+    }
+    <button class="btn btn-success" @onclick="RandomValue">
+        Random Number
+    </button>
+</div>
+
+<section class="mt-4 d-flex flex-row justify-content-evenly">
+    <div>
+        <!-- Heading for this Section -->
+        <h3>Text Boxes</h3>
+        <!-- Using Bootstrap label and input to enter an email -->
+        <div class="mb-3">
+            <label for="emailExample" class="form-label">Enter an Email</label>
+            <input type="email" class="form-control" id="emailExample" @bind="emailText">
+        </div>
+        <!-- Using Bootstrap label and input to enter a password -->
+        <div class="mb-3">
+            <label for="passwordExample" class="form-label">Enter a Password</label>
+            <input type="password" class="form-control" id="passwordExample" @bind="passwordText">
+        </div>
+        <!-- Using Bootstrap label and input to enter a date -->
+        <div class="mb-3">
+            <label for="dateExample" class="form-label">Enter a Date</label>
+            <input type="date" class="form-control" id="dateExample" @bind="dateText">
+        </div>
+        <!-- Button to trigger the TextSubmit Method -->
+        <button class="btn btn-info" @onclick="TextSubmit">
+            Text Submit
+        </button>
+    </div>
+    <div>
+        <h3>Radio buttons, Checkbox, Text Area</h3>
+        <div class="mb-3">
+            <!-- Example using a Microsoft Component -->
+            <label class="form-label">Select your favourite meal (Microsoft): </label><br />
+            <!-- Note: Name in the InputRadioGroup and InputRadio items must match -->
+            <InputRadioGroup Name="mealRadio" @bind-Value="mealMicrosoft">
+                @foreach (var meal in meals)
+                {
+                    <InputRadio Name="mealRadio" Value="@meal" class="form-check-input" />
+
+                    <span class="form-check-label">@($"   {meal}")</span>
+                    <br />
+                }
+            </InputRadioGroup>
+        </div>
+        <div class="mb-3">
+            <!-- Example using input -->
+            <label class="form-label">Select your favourite meal (Bootstrap): </label>
+            @foreach (var item in meals)
+            {
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="radio"
+                           name="meal"
+                           id="meal-@item"
+                           @onchange="HandleMealSelection"
+                           checked="@(item == mealBootstrap)"
+                           value="@item">
+                    <label class="form-check-label" for="meal-@item">
+                        @item
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="exampleCheckbox" @bind="acceptanceBox" />
+                <label class="form-check-label" for="exampleCheckbox">
+                    I accept the terms of service.
+                </label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <textarea rows="5"
+                      cols="50"
+                      class="form-control"
+                      placeholder="enter message..."
+                      @bind="messageBody" />
+        </div>
+        <button class="btn btn-success" @onclick="RadioCheckAreaSubmit">
+            Radio/Check/Area Submit
+        </button>
+    </div>
+    <div>
+        <h3>List and Slider</h3>
+        <!-- Display a label for the dropdown -->
+        <label for="rideSelect" class="form-label">
+            Select your favourite ride
+        </label>
+        <!-- Create a dropdown select element that binds to the 'myRide' field -->
+        <select class="form-select" id="rideSelect" @bind="myRide">
+            <!--
+                Default option, displayed when no option selected
+                Since this is an int, the value must be 0 which is
+                the default int value.
+                For strings value should = "" or not be set
+            -->
+            <option value="0">Select ride...</option>
+            <!-- Loop through all values in the rides collection and create an option for each -->
+            @foreach (var item in rides)
+            {
+                <!--
+                    Use the .Key for the dictionary as the value as it is an int
+                    Use the .Value to display the string value from the dictionary
+                -->
+                <option value="@item.Key">@item.Value</option>
+            }
+        </select>
+        <label class="form-label">
+            Select favourite Vacation Spot
+            <input type="text" @bind="vacationSpot"
+                   list="VacationChoices"
+                   class="form-control" />
+            <datalist id="VacationChoices">
+                <!-- Data lists do not have default values -->
+                @foreach (var item in vacationSpots)
+                {
+                    <option value="@item" />
+                }
+            </datalist>
+        </label>
+        <br />
+        <!-- Label for the slider -->
+        <label for="reviewRange" class="form-label">Rate the form control review (0 = bad, 10 = good)</label>
+        <!-- Input element of type="range", bind to the reviewRating field -->
+        <input type="range" class="form-range" id="reviewRange" @bind="reviewRating" min="0" max="10" steps="1" />
+        <!-- Displays the selected value in the range to the user -->
+        <h6>Rating: @reviewRating</h6>
+        <button class="btn btn-primary" @onclick="ListSliderSubmit">
+            List/Slider Submit
+        </button>
+    </div>
+</section>
+<div class="mt-2 mx-auto">
+    <h2>@feedback</h2>
+</div>

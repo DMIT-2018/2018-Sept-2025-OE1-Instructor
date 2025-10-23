@@ -1,0 +1,65 @@
+﻿@page "/SamplePages/Customers"
+
+<PageTitle>Customer Search</PageTitle>
+
+<MudText Typo="Typo.h3">Customer Search</MudText>
+
+@if (hasError)
+{
+    <MudAlert Elevation="2"
+              Severity="Severity.Error"
+              Dense
+              Variant="Variant.Outlined">
+        <MudText Typo="Typo.h6">@errorMessage</MudText>
+        @foreach (var error in errorDetails)
+        {
+            <MudText Typo="Typo.body2">@error</MudText>
+        }
+    </MudAlert>
+}
+
+<MudStack Row>
+    <MudTextField @bind-Value="lastName"
+                  Variant="Variant.Outlined"
+                  Label="Last Name"
+                  Immediate />
+    <MudTextField @bind-Value="phoneNumber"
+                  Variant="Variant.Outlined"
+                  Label="Phone Number"
+                  Immediate />
+    <MudButton Variant="Variant.Outlined"
+               Color="Color.Secondary"
+               OnClick="GetCustomers">
+        Search       
+    </MudButton>
+</MudStack>
+
+<MudDataGrid Items="CustomerList"
+             Striped
+             FixedFooter
+             FixedHeader
+             Height="62vh">
+    <Columns>
+        <TemplateColumn>
+            <HeaderTemplate>
+                Actions
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Tertiary"
+                           OnClick="() => EditCustomer(context.Item.CustomerID)">
+                    Edit
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.FullName" Title="Customer Name" />
+        <PropertyColumn Property="x => x.Address" Title="Address" />
+        <PropertyColumn Property="x => x.Phone" Title="Phone Number" />
+        <PropertyColumn Property="x => x.Email" Title="Email" />
+        <PropertyColumn Property="x => x.Status" Title="Status" />
+        <PropertyColumn Property="x => x.TotalSales" Title="Total Sales"  />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>

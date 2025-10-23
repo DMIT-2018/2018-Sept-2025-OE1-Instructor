@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using BlazorWebApp.Components;
 using BlazorWebApp.Components.Account;
 using BlazorWebApp.Data;
+using OLTPSystem;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,10 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var oltpConnectionString = builder.Configuration.GetConnectionString("OLTPDB") ?? throw new InvalidOperationException("Connection string 'OLTPDB' not found.");
+
+builder.Services.OLTPDependencies(options => options.UseSqlServer(oltpConnectionString));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

@@ -1,0 +1,117 @@
+﻿@page "/SamplePages/CustomerEdit/{CustomerID:int}"
+<!--
+    Adding a parameter within the string substitution syntax { }
+    {ParameterName:Datatype}
+
+    Make sure we name the parameter here the exact same as the parameter
+    we create in our code behind
+-->
+
+@if(CustomerID == 0)
+{
+    <MudText Typo="Typo.h3">New Customer</MudText>
+}
+else
+{
+    <MudText Typo="Typo.h3">Edit Customer: @editCustomer.FirstName @editCustomer.LastName</MudText>
+}
+
+@if (hasError)
+{
+    <MudAlert Elevation="2"
+              Severity="Severity.Error"
+              Dense
+              Variant="Variant.Outlined">
+        <MudText Typo="Typo.h6">@errorMessage</MudText>
+        @foreach (var error in errorDetails)
+        {
+            <MudText Typo="Typo.body2">@error</MudText>
+        }
+    </MudAlert>
+}
+
+<MudText Typo="Typo.h6">Form Valid: @isFormValid</MudText>
+<MudText Typo="Typo.h6">Form Touched: @hasFormChanged</MudText>
+
+<MudForm @ref="customerForm" @bind-IsValid="isFormValid" @bind-IsTouched="hasFormChanged">
+    <!--
+        Inside the mudform can look whatever way we want
+    -->
+    <MudGrid>
+        <!--Column One-->
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="First Name"
+                          @bind-Value="editCustomer.FirstName"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="First Name must be provided."
+                          MaxLength="20"
+                          Immediate />
+            <MudTextField Label="Last Name"
+                          @bind-Value="editCustomer.LastName"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="Last Name must be provided."
+                          MaxLength="50"
+                          Immediate />
+            <MudTextField Label="Address 1"
+                          @bind-Value="editCustomer.Address1"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="Address 1 must be provided."
+                          MaxLength="50"
+                          Immediate />
+            <MudTextField Label="Address 2"
+                          @bind-Value="editCustomer.Address2"
+                          Variant="Variant.Outlined"
+                          MaxLength="50"
+                          Immediate />
+            <MudTextField Label="City"
+                          @bind-Value="editCustomer.City"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="City must be provided."
+                          MaxLength="50"
+                          Immediate />
+        </MudItem>
+
+        <!--Column Two-->
+        <MudItem xs="12" sm="6">
+            <MudTextField Label="Postal Code"
+                          @bind-Value="editCustomer.PostalCode"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="Postal Code must be provided."
+                          MaxLength="20"
+                          Immediate />
+            <MudTextField Label="Phone Number"
+                          @bind-Value="editCustomer.Phone"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="Phone number must be provided."
+                          MaxLength="20"
+                          Immediate />
+            <MudTextField Label="Email"
+                          @bind-Value="editCustomer.Email"
+                          Variant="Variant.Outlined"
+                          Required
+                          RequiredError="Email must be provided."
+                          MaxLength="20"
+                          Immediate />
+        </MudItem>
+        <MudItem xs="12">
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Disabled=@(!isFormValid || !hasFormChanged)>
+                    Save    
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Secondary">
+                    @closeButtonText
+                </MudButton>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+</MudForm>
+

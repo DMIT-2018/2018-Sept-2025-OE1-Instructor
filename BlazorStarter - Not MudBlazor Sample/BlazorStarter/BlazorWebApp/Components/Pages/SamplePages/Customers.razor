@@ -57,7 +57,9 @@
         <PropertyColumn Property="x => x.Phone" Title="Phone Number" />
         <PropertyColumn Property="x => x.Email" Title="Email" />
         <PropertyColumn Property="x => x.Status" Title="Status" />
-        <PropertyColumn Property="x => x.TotalSales" Title="Total Sales"  />
+        <PropertyColumn Property="@(x => x.TotalSales > 0
+                                        ? x.TotalSales.ToString("C2")
+                                        : string.Empty)" Title="Total Sales"  />
     </Columns>
     <PagerContent>
         <MudDataGridPager />

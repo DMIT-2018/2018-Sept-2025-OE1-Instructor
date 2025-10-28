@@ -194,7 +194,7 @@ namespace OLTPSystem.BLL
 		//First we check if there is an existingCustomer in the database
 		//	We need the existing customer to edit the database record
 		//	NOTE: You are returning the actual Database Type (Customer)
-		Customer customer = _context.Customers
+		Customer? customer = _context.Customers
 			.Where(x => x.CustomerId == editCustomer.CustomerID)
 			.FirstOrDefault();
 
@@ -208,7 +208,7 @@ namespace OLTPSystem.BLL
 			//Create a new Customer record
 			customer = new();
 		}
-		else
+		else if(customer == null && editCustomer.CustomerID != 0)
 		{
 			result.AddError(new Error("Cannot find Record to Edit", $"CustomerID {editCustomer.CustomerID} cannot be found, edits cannot be made."));
 			return result;
@@ -223,12 +223,12 @@ namespace OLTPSystem.BLL
 		customer.Address1 = editCustomer.Address1;
 		customer.Address2 = editCustomer.Address2;
 		customer.City = editCustomer.City;
-		customer.ProvStateId = editCustomer.ProvStateID;
-		customer.CountryId = editCustomer.CountryID;
+		customer.ProvStateId = editCustomer.ProvStateID ?? 0;
+		customer.CountryId = editCustomer.CountryID ?? 0;
 		customer.PostalCode = editCustomer.PostalCode;
 		customer.Phone = editCustomer.Phone;
 		customer.Email = editCustomer.Email;
-		customer.StatusId = editCustomer.StatusID;
+		customer.StatusId = editCustomer.StatusID ?? 0;
 		//This may be a logical delete in the edit
 		//	We still can use the AddEdit method to logically delete
 		//	We don't need a different method unless for specific reasons
@@ -266,7 +266,7 @@ namespace OLTPSystem.BLL
 			//	If you do not, then any database change are still staged (Add or Update) and will continue to fail
 			//	whenever you call this method again from the same page.
 			_context.ChangeTracker.Clear();
-			result.AddError(new Error("Error Saving Changes", ex.InnerException.Message));
+			result.AddError(new Error("Error Saving Changes", ex.InnerException?.Message ?? string.Empty));
 			return result;
 		}
 	}

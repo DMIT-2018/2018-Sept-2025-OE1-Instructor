@@ -21,7 +21,8 @@ else
     <MudAlert Elevation="2"
               Severity="Severity.Error"
               Dense
-              Variant="Variant.Outlined">
+              Variant="Variant.Outlined"
+              Class="mb-2">
         <MudText Typo="Typo.h6">@errorMessage</MudText>
         @foreach (var error in errorDetails)
         {
@@ -29,9 +30,16 @@ else
         }
     </MudAlert>
 }
-
-<MudText Typo="Typo.h6">Form Valid: @isFormValid</MudText>
-<MudText Typo="Typo.h6">Form Touched: @hasFormChanged</MudText>
+@if (!string.IsNullOrWhiteSpace(feedbackMessage))
+{
+    <MudAlert Elevation="2"
+              Severity="Severity.Success"
+              Dense
+              Variant="Variant.Outlined"
+              Class="mb-2">
+        <MudText Typo="Typo.h6">@feedbackMessage</MudText>
+    </MudAlert>
+}
 
 <MudForm @ref="customerForm" @bind-IsValid="isFormValid" @bind-IsTouched="hasFormChanged">
     <!--
@@ -73,10 +81,32 @@ else
                           RequiredError="City must be provided."
                           MaxLength="50"
                           Immediate />
+            <MudSelect @bind-Value="editCustomer.ProvStateID"
+                       Variant="Variant.Outlined"
+                       Label = "Province"
+                       Required
+                       RequiredError="Province selected is required."
+                       Placeholder="Select Province...">
+                @foreach(var item in provinces)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
         </MudItem>
 
         <!--Column Two-->
         <MudItem xs="12" sm="6">
+            <MudSelect @bind-Value="editCustomer.CountryID"
+                       Variant="Variant.Outlined"
+                       Label="Country"
+                       Required
+                       RequiredError="Country selected is required."
+                       Placeholder="Select Country...">
+                @foreach (var item in countries)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
             <MudTextField Label="Postal Code"
                           @bind-Value="editCustomer.PostalCode"
                           Variant="Variant.Outlined"
@@ -98,16 +128,29 @@ else
                           RequiredError="Email must be provided."
                           MaxLength="20"
                           Immediate />
+            <MudSelect @bind-Value="editCustomer.StatusID"
+                       Variant="Variant.Outlined"
+                       Label="Status"
+                       Required
+                       RequiredError="Status selected is required."
+                       Placeholder="Select Status...">
+                @foreach (var item in statuses)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
         </MudItem>
         <MudItem xs="12">
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="4">
                 <MudButton Variant="Variant.Filled"
                            Color="Color.Primary"
-                           Disabled=@(!isFormValid || !hasFormChanged)>
+                           Disabled=@(!isFormValid || !hasFormChanged)
+                           OnClick="AddEditCustomer">
                     Save    
                 </MudButton>
                 <MudButton Variant="Variant.Filled"
-                           Color="Color.Secondary">
+                           Color="Color.Secondary"
+                           OnClick="Cancel">
                     @closeButtonText
                 </MudButton>
             </MudStack>

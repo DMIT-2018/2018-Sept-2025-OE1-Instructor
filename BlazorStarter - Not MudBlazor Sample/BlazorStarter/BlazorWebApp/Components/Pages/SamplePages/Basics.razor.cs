@@ -58,8 +58,6 @@ namespace BlazorWebApp.Components.Pages.SamplePages
         // Used for the resulting feedback to the user
         // Not part of a specific area of the page so left outside any region
         private string feedback = string.Empty;
-
-        private InputRadioGroup<string> inputRadioGroup;
         #endregion
 
         #region Properties

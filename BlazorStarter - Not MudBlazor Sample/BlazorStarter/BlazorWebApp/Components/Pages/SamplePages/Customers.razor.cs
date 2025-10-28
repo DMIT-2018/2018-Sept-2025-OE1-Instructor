@@ -58,6 +58,10 @@ namespace BlazorWebApp.Components.Pages.SamplePages
         {
             NavigationManager.NavigateTo($"/SamplePages/CustomerEdit/{customerID}");
         }
+        public void NewCustomer()
+        {
+            NavigationManager.NavigateTo("/SamplePages/CustomerEdit/0");
+        }
         #endregion
     }
 }

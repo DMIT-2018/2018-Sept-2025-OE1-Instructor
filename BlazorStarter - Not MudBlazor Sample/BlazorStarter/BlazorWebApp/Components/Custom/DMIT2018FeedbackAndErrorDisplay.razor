@@ -1,0 +1,25 @@
+﻿<!-- Custom Components do not have a page directive -->
+@if (hasError)
+{
+    <MudAlert Elevation="0"
+              Severity="Severity.Error"
+              Dense
+              Variant="Variant.Outlined"
+              Class="mb-2">
+        <MudText Typo="Typo.h6">@ErrorMessage</MudText>
+        @foreach (var error in ErrorDetails)
+        {
+            <MudText Typo="Typo.body2">@error</MudText>
+        }
+    </MudAlert>
+}
+@if (!string.IsNullOrWhiteSpace(FeedbackMessage))
+{
+    <MudAlert Elevation="0"
+              Severity="Severity.Success"
+              Dense
+              Variant="Variant.Outlined"
+              Class="mb-2">
+        <MudText Typo="Typo.h6">@FeedbackMessage</MudText>
+    </MudAlert>
+}

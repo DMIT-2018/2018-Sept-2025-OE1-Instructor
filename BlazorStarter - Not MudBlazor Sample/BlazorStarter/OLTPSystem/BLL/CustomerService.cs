@@ -116,16 +116,26 @@ namespace OLTPSystem.BLL
 				StatusID = x.StatusId,
 				RemoveFromViewFlag = x.RemoveFromViewFlag,
 				OriginalFirstName = x.FirstName,
-				HasInvoices = x.Invoices.Any()
+				HasInvoices = x.Invoices.Any(),
+				Invoices = x.Invoices.Select(i => new InvoiceListView
+				{
+					InvoiceID = i.InvoiceId,
+					InvoiceDate = i.InvoiceDate,
+					CustomerID = i.CustomerId,
+					EmployeeID = i.EmployeeId,
+					CustomerName = i.Customer.FirstName + " " + i.Customer.LastName,
+					EmployeeName = i.Employee.FirstName + " " + i.Employee.LastName,
+					Total = i.SubTotal + i.Tax
+				}).ToList()
 			})
 			.FirstOrDefault();
-			
-		if(customer == null)
+
+		if (customer == null)
 		{
 			result.AddError(new Error("No Customer", $"No customer was found with ID: {customerID}"));
 			return result;
 		}
-		
+
 		return result.WithValue(customer);
 	}
 	

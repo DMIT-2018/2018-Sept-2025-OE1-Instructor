@@ -1,0 +1,9 @@
+﻿@page "/SamplePages/InvoiceEdit/{InvoiceID:int}/{CustomerID:int}/{EmployeeID:int}"
+
+<PageTitle>Invoice Edit</PageTitle>
+
+<MudText Typo="Typo.h3">
+    @(InvoiceID == 0 ? "New Invoice" : $"Invoice #: {InvoiceID}")
+</MudText>
+
+<DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />

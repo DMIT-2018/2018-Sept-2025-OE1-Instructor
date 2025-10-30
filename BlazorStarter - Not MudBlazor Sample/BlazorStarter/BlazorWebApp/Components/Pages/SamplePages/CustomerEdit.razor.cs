@@ -3,6 +3,7 @@ using MudBlazor;
 using OLTPSystem.BLL;
 using OLTPSystem.Entities;
 using OLTPSystem.ViewModels;
+using System.Threading.Tasks;
 
 namespace BlazorWebApp.Components.Pages.SamplePages
 {
@@ -42,8 +43,6 @@ namespace BlazorWebApp.Components.Pages.SamplePages
         //Must be included to show a dialogue in MudBlazor
         [Inject]
         protected IDialogService DialogService { get; set; } = default!;
-
-        private bool hasError => !string.IsNullOrEmpty(errorMessage) || errorDetails.Any();
         private string closeButtonText => hasFormChanged ? "Cancel" : "Close";
         #endregion
 
@@ -153,6 +152,31 @@ namespace BlazorWebApp.Components.Pages.SamplePages
             {
                 errorMessage = ex.Message;
             }
+        }
+
+        public async Task EditInvoice(int invoiceID)
+        {
+            errorDetails.Clear();
+            errorMessage = string.Empty;
+            feedbackMessage = string.Empty;
+
+            //Anytime the user could lose edited data, we want to warn them!
+            if(hasFormChanged)
+            {
+                bool? result = await DialogService.ShowMessageBox("Confirm Navigation",
+                                    "Are you sure you want the edit the invoice? All unsaved customer changes will be lost.", yesText: "Yes", noText: "Nope");
+                if (result != true)
+                {
+                    return;
+                }
+            }
+            //Note: We are hardcoding the EmployeeID as '1' at this time as we have no authentication
+            NavigationManager.NavigateTo($"/SamplePages/InvoiceEdit/{invoiceID}/{CustomerID}/1");
+        }
+
+        private void NewInvoice()
+        {
+            NavigationManager.NavigateTo($"/SamplePages/InvoiceEdit/0/{CustomerID}/1");
         }
         #endregion
     }

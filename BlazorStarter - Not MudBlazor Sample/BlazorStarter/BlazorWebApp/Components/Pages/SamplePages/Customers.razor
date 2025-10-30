@@ -4,19 +4,7 @@
 
 <MudText Typo="Typo.h3">Customer Search</MudText>
 
-@if (hasError)
-{
-    <MudAlert Elevation="2"
-              Severity="Severity.Error"
-              Dense
-              Variant="Variant.Outlined">
-        <MudText Typo="Typo.h6">@errorMessage</MudText>
-        @foreach (var error in errorDetails)
-        {
-            <MudText Typo="Typo.body2">@error</MudText>
-        }
-    </MudAlert>
-}
+<DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />
 
 <MudStack Row AlignItems="AlignItems.Center">
     <MudTextField @bind-Value="lastName"

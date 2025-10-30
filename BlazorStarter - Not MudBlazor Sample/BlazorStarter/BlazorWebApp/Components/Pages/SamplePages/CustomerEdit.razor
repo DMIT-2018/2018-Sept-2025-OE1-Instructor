@@ -16,30 +16,7 @@ else
     <MudText Typo="Typo.h3">Edit Customer: @editCustomer.FirstName @editCustomer.LastName</MudText>
 }
 
-@if (hasError)
-{
-    <MudAlert Elevation="2"
-              Severity="Severity.Error"
-              Dense
-              Variant="Variant.Outlined"
-              Class="mb-2">
-        <MudText Typo="Typo.h6">@errorMessage</MudText>
-        @foreach (var error in errorDetails)
-        {
-            <MudText Typo="Typo.body2">@error</MudText>
-        }
-    </MudAlert>
-}
-@if (!string.IsNullOrWhiteSpace(feedbackMessage))
-{
-    <MudAlert Elevation="2"
-              Severity="Severity.Success"
-              Dense
-              Variant="Variant.Outlined"
-              Class="mb-2">
-        <MudText Typo="Typo.h6">@feedbackMessage</MudText>
-    </MudAlert>
-}
+<DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />
 
 <MudForm @ref="customerForm" @bind-IsValid="isFormValid" @bind-IsTouched="hasFormChanged">
     <!--
@@ -154,6 +131,47 @@ else
                     @closeButtonText
                 </MudButton>
             </MudStack>
+        </MudItem>
+        <MudItem xs="12" Class="mt-4">
+            <MudDataGrid Items="editCustomer.Invoices"
+                         Striped
+                         FixedFooter
+                         FixedHeader
+                         Height="20vh">
+                <ToolBarContent>
+                    <MudSpacer />
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Success"
+                               OnClick="NewInvoice">
+                        Add Invoice       
+                    </MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <TemplateColumn>
+                        <HeaderTemplate>
+                            Actions
+                        </HeaderTemplate>
+                        <CellTemplate>
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       OnClick="() => EditInvoice(context.Item.InvoiceID)">
+                                Edit Invoice       
+                            </MudButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x => x.InvoiceID" Title="Invoice ID" />
+                    <PropertyColumn Property="x => x.InvoiceDate" Title="Date"/>
+                    <PropertyColumn Property="x => x.EmployeeName" Title="Employee"/>
+                    <PropertyColumn Property="x => x.CustomerName" Title="Customer"/>
+                    <PropertyColumn Property="@(x => x.Total.ToString("C2"))" Title="Total"/>
+                </Columns>
+                <NoRecordsContent>
+                    <MudText Typo="Typo.h6">No invoices for the Customer.</MudText>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudDataGridPager />
+                </PagerContent>
+            </MudDataGrid>
         </MudItem>
     </MudGrid>
 </MudForm>

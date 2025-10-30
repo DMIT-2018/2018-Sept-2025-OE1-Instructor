@@ -25,5 +25,7 @@ namespace OLTPSystem.ViewModels
         //We can add additional calculated fields (fields not in the database) still
         public string OriginalFirstName { get; set; } = string.Empty;
         public bool HasInvoices { get; set; }
+        //Whenever a view has a collection, make sure to default it to an empty collection!
+        public List<InvoiceListView> Invoices { get; set; } = [];
     }
 }

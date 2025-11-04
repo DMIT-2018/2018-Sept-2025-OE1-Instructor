@@ -937,7 +937,7 @@ public class InvoiceService
 		{
 			invoice = new Invoice();
 		}
-		else
+		else if(invoice == null && invoiceView.InvoiceID != 0)
 		{
 			result.AddError(new Error("Invoice Not Found", $"An invoice with invoiceID {invoiceView.InvoiceID} could not be found to edit."));
 			return result;

@@ -1,4 +1,5 @@
 ﻿@page "/SamplePages/InvoiceEdit/{InvoiceID:int}/{CustomerID:int}/{EmployeeID:int}"
+@using OLTPSystem.ViewModels
 
 <PageTitle>Invoice Edit</PageTitle>
 
@@ -41,3 +42,73 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
+<MudStack Row
+          Class="mt-2"
+          AlignItems="AlignItems.Center"
+          Spacing="4">
+    <MudSelect Variant="Variant.Outlined"
+               Immediate
+               Placeholder="Select a Category"
+               Value="categoryID"
+               ValueChanged="(int? newCategoryID) => CategoryChanged(newCategoryID)">
+        @foreach(var category in parts.Select(x => new
+                                    {
+                                        CategoryID = x.PartCategoryID,
+                                        CategoryName = x.CategoryName
+                                    })
+                                    .Distinct()
+                                    .ToList())
+        {
+            <MudSelectItem T="int?" Value="category.CategoryID">@category.CategoryName</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSelect Variant="Variant.Outlined"
+               Immediate
+               Placeholder="Select a Part..."
+               @bind-Value="selectedPart"
+               Disabled="@(categoryID == null || categoryID == 0)">
+        @foreach(var part in parts.Where(x => x.PartCategoryID == categoryID 
+                            && !invoice.InvoiceLines.Select(p => p.PartID).Contains(x.PartID)).ToList())
+        {
+            <MudSelectItem T="InvoicePartView" Value="part">@part.Description (@part.QOH)</MudSelectItem>
+        }
+    </MudSelect>
+    <MudNumericField @bind-Value="quantity"
+                     Variant="Variant.Outlined"
+                     Min="0"
+                     Max="selectedPart?.QOH ?? 0"
+                     Disabled=@(selectedPart == null) />
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Disabled="@(quantity <= 0)"
+               OnClick="AddPart">
+        Add Part       
+    </MudButton>
+</MudStack>
+<MudDataGrid Items="invoice.InvoiceLines"
+             Striped
+             Class="mt-2"
+             FixedFooter
+             FixedHeader
+             Height="40vh"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Cell"
+             EditTrigger="DataGridEditTrigger.OnRowClick">
+    <Columns>
+        <PropertyColumn Property="x => x.PartID" Title="Part ID" Editable="false" />
+        <PropertyColumn Property="x => x.PartDescription" Title="Description" Editable="false" />
+        <PropertyColumn Property="x => x.Quantity" Title="Quantity">
+            <EditTemplate>
+                <MudNumericField Value="context.Item.Quantity"
+                                 ValueChanged="(int newQuantity) => QuantityEdited(context.Item, newQuantity)"
+                                 Immediate
+                                 Margin="Margin.Dense"
+                                 Min="0"
+                                 Max="@(parts.Where(x => x.PartID == context.Item.PartID).Select(x => x.QOH).FirstOrDefault())" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Price" Title="Price" Editable="false" />
+        <PropertyColumn Property="x => x.ExtentPrice" Title="Ext. Price" Editable="false" />
+    </Columns>         
+</MudDataGrid>
+

@@ -3,7 +3,41 @@
 <PageTitle>Invoice Edit</PageTitle>
 
 <MudText Typo="Typo.h3">
-    @(InvoiceID == 0 ? "New Invoice" : $"Invoice #: {InvoiceID}")
+    @(invoice.InvoiceID == 0 ? "New Invoice" : $"Invoice #: {invoice.InvoiceID}")
 </MudText>
 
 <DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />
+
+<MudGrid>
+    <MudItem sm="12" md="6">
+        <MudPaper Elevation="4" Class="pa-2" Height="155px">
+            <MudStack>
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Invoice Date: </strong>@invoice.InvoiceDate.ToShortDateString()
+                </MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Employee: </strong>@invoice.EmployeeName (@invoice.EmployeeID)
+                </MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Customer: </strong>@invoice.CustomerName (@invoice.CustomerID)
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem sm="12" md="6">
+        <MudPaper Elevation="4" Class="pa-2" Height="155px">
+            <MudStack>
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Subtotal: </strong>@invoice.SubTotal.ToString("C2")
+                </MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Tax: </strong>@invoice.Tax.ToString("C2")
+                </MudText>
+                <MudDivider DividerType="DividerType.Middle" />
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Total: </strong>@invoice.Total.ToString("C2")
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>

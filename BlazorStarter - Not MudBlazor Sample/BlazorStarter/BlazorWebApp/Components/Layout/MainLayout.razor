@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="DMIT2018Theme"/>
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -9,7 +9,10 @@
         <MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
         <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudToggleIconButton @bind-Toggled="_isDarkMode"
+                             Icon="@Icons.Material.Filled.ShieldMoon"
+                             Color="Color.Warning"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" />
     </MudAppBar>
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
@@ -28,6 +31,17 @@
 
 @code {
     private bool _drawerOpen = true;
+    private bool _isDarkMode = true;
+
+    MudTheme DMIT2018Theme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            AppbarBackground = "#001D4A",
+            Primary = "#6EA4BF",
+            Secondary = "#88D18A",
+            Tertiary = "#A76D60",
+            Divider = "#643A71"
+        }
+    };
 }
-
-

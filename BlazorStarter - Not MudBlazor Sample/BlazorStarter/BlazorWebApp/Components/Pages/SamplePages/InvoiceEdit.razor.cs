@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using OLTPSystem.BLL;
 using OLTPSystem.ViewModels;
 
 namespace BlazorWebApp.Components.Pages.SamplePages
@@ -22,6 +23,33 @@ namespace BlazorWebApp.Components.Pages.SamplePages
         public int CustomerID { get; set; }
         [Parameter]
         public int EmployeeID { get; set; }
+        #endregion
+
+        #region Properties
+        [Inject]
+        public InvoiceService InvoiceService { get; set; } = default!;
+        #endregion
+
+        #region Methods
+        protected override void OnInitialized()
+        {
+            errorDetails.Clear();
+            errorMessage = string.Empty;
+            feedbackMessage = String.Empty;
+
+            try
+            {
+                var invoiceResults = InvoiceService.GetInvoice(InvoiceID, CustomerID, EmployeeID);
+                if (invoiceResults.IsSuccess)
+                    invoice = invoiceResults.Value ?? new();
+                else
+                    errorDetails = BlazorHelperClass.GetErrorMessages(invoiceResults.Errors.ToList());
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+        }
         #endregion
     }
 }

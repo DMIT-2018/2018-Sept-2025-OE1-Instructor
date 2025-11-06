@@ -33,6 +33,14 @@ namespace OLTPSystem
                     throw new InvalidOperationException("OLTPContext is not registered.")
                     : new LookupService(context);
             });
+
+            services.AddScoped<InvoiceService>((ServiceProvider) =>
+            {
+                var context = ServiceProvider.GetService<OLTPContext>();
+                return context == null ?
+                    throw new InvalidOperationException("OLTPContext is not registered.")
+                    : new InvoiceService(context);
+            });
         }
     }
 }

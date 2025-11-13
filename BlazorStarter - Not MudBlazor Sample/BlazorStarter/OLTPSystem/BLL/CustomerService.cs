@@ -69,7 +69,9 @@ namespace OLTPSystem.BLL
 				Phone = x.Phone,
 				Email = x.Email,
 				Status = x.Status.Name,
-				TotalSales = x.Invoices.Sum(i => i.SubTotal + i.Tax)
+				TotalSales = x.Invoices
+								.Where(i => !i.RemoveFromViewFlag)
+								.Sum(i => i.SubTotal + i.Tax)
 			})
 			.ToList();
 			
@@ -117,16 +119,18 @@ namespace OLTPSystem.BLL
 				RemoveFromViewFlag = x.RemoveFromViewFlag,
 				OriginalFirstName = x.FirstName,
 				HasInvoices = x.Invoices.Any(),
-				Invoices = x.Invoices.Select(i => new InvoiceListView
-				{
-					InvoiceID = i.InvoiceId,
-					InvoiceDate = i.InvoiceDate,
-					CustomerID = i.CustomerId,
-					EmployeeID = i.EmployeeId,
-					CustomerName = i.Customer.FirstName + " " + i.Customer.LastName,
-					EmployeeName = i.Employee.FirstName + " " + i.Employee.LastName,
-					Total = i.SubTotal + i.Tax
-				}).ToList()
+				Invoices = x.Invoices
+					.Where(i => !i.RemoveFromViewFlag)
+					.Select(i => new InvoiceListView
+					{
+						InvoiceID = i.InvoiceId,
+						InvoiceDate = i.InvoiceDate,
+						CustomerID = i.CustomerId,
+						EmployeeID = i.EmployeeId,
+						CustomerName = i.Customer.FirstName + " " + i.Customer.LastName,
+						EmployeeName = i.Employee.FirstName + " " + i.Employee.LastName,
+						Total = i.SubTotal + i.Tax
+					}).ToList()
 			})
 			.FirstOrDefault();
 

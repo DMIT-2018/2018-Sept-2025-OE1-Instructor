@@ -4,7 +4,7 @@
 <PageTitle>Invoice Edit</PageTitle>
 
 <MudText Typo="Typo.h3">
-    @(invoice.InvoiceID == 0 ? "New Invoice" : $"Invoice #: {invoice.InvoiceID}")
+    @(invoice.InvoiceID == 0 ? "New Invoice" : $"Invoice #: {invoice.InvoiceID} {randomMessage}")
 </MudText>
 
 <DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />
@@ -107,8 +107,45 @@
                                  Max="@(parts.Where(x => x.PartID == context.Item.PartID).Select(x => x.QOH).FirstOrDefault())" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.Price" Title="Price" Editable="false" />
-        <PropertyColumn Property="x => x.ExtentPrice" Title="Ext. Price" Editable="false" />
+        <PropertyColumn Property="x => x.Price" Title="Price">
+            <EditTemplate>
+                <MudNumericField Value="context.Item.Price"
+                                 ValueChanged="(decimal newPrice) => PriceEdited(context.Item, newPrice)"
+                                 Immediate
+                                 Margin="Margin.Dense"
+                                 Min="0.00m"
+                                 Step="0.5m"
+                                 Format="C2" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ExtentPrice" Title="Ext. Price" Editable="false" Format="C2"/>
+        <TemplateColumn Editable="false">
+            <CellTemplate>
+                <MudIconButton Color="Color.Error" 
+                               Icon="@Icons.Material.Filled.Delete"
+                               OnClick="@(() => DeletePart(context.Item))" />
+                <MudIconButton Color="Color.Tertiary"
+                               Icon="@Icons.Material.Filled.Sync"
+                               OnClick="() => SyncPrice(context.Item)" />
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>         
 </MudDataGrid>
 
+<!-- Save/Exit Buttons -->
+<MudStack Class="mt-2"
+          Spacing="2"
+          Row
+          AlignItems="AlignItems.Center"
+          Justify="Justify.Center">
+    <MudButton Color="Color.Primary"
+               Variant="Variant.Filled"
+               OnClick="SaveInvoice">
+        Save       
+    </MudButton>
+    <MudButton Color="Color.Info"
+               Variant="Variant.Filled"
+               OnClick="CloseInvoice">
+        @(edited ? "Cancel" : "Close")
+    </MudButton>
+</MudStack>

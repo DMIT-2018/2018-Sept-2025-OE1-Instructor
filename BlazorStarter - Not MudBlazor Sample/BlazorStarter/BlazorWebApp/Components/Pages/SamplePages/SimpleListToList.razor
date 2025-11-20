@@ -1,0 +1,55 @@
+﻿@page "/SamplePages/ListToList"
+
+<PageTitle>List To List</PageTitle>
+<MudText Typo="Typo.h3">Simple List to List</MudText>
+<DMIT2018FeedbackAndErrorDisplay ErrorDetails="@errorDetails" ErrorMessage="@errorMessage" FeedbackMessage="@feedbackMessage" />
+<MudGrid>
+    <MudItem xs=12 md="6">
+        <MudDataGrid Items="inventory.Where(x => !shoppingCart.Select(p => p.PartID).Contains(x.PartID))"
+                     Dense
+                     Striped
+                     FixedFooter
+                     FixedHeader
+                     Height="65vh">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Available Inventory</MudText>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.CategoryName" Title="Category" />
+                <PropertyColumn Property="x => x.Description" Title="Description" />
+                <PropertyColumn Property="x => x.Price" Title="Price" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Color="Color.Primary"
+                                       OnClick="() => AddPartToCart(context.Item)"
+                                       Icon="@Icons.Material.Filled.AddShoppingCart" />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudDataGrid Items="shoppingCart"
+                     Dense
+                     Striped
+                     FixedFooter
+                     FixedHeader
+                     Height="65vh">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Shopping Cart</MudText>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.PartID" Title="Part ID" />
+                <PropertyColumn Property="x => x.PartDescription" Title="Description" />
+                <PropertyColumn Property="x => x.Price" Title="Price" />
+                <TemplateColumn>
+                    <CellTemplate>
+                        <MudIconButton Color="Color.Primary"
+                                       OnClick="() => RemoveFromCart(context.Item)"
+                                       Icon="@Icons.Material.Filled.RemoveShoppingCart" />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+</MudGrid>
